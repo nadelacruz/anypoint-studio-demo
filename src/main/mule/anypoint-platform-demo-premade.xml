@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8aa64b16-05de-4f8b-9e0f-adb7b5787983" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="anypoint-platform-demo-premade-main-flow" doc:id="00f7a14b-4c12-43fe-8998-060348b989bf" >
+		<http:listener doc:name="/" doc:id="076b64c6-bcfb-4760-9d74-65521736da1a" config-ref="HTTP_Listener_config" path="/"/>
+		<logger level="INFO" doc:name="Logger - Start" doc:id="ac65d6be-6e33-4386-bcde-b449a927483b" message="Start - Main Flow"/>
+		<flow-ref doc:name="anypoint-platform-demo-premade-main-router" doc:id="e28fc331-e17e-4288-b0bb-41ff601b9097" name="anypoint-platform-demo-premade-main-router"/>
+		<logger level="INFO" doc:name="Logger - End" doc:id="d95bd35f-f8c6-4c9f-96d7-eceaf8887113" message="End - Main Flow" />
+	</flow>
+	<sub-flow name="anypoint-platform-demo-premade-main-router" doc:id="af7ae185-bbdc-4999-8cb8-6354562b7ed5" >
+		<choice doc:name="Main Router" doc:id="b9b97d8a-fac0-47bf-ba08-f03a6f922e02" >
+			<when expression='#["scatter_gather" == attributes.queryParams.action]'>
+				<logger level="INFO" doc:name="Logger - Scatter Gather" doc:id="ef27dec1-5deb-44e1-ba18-c24a54634b97" message="Scatter Gather Branch" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-scatter-gather" doc:id="c7f73ed0-20a6-4941-bb4d-666b4eee32f5" name="anypoint-platform-demo-premade-scatter-gather" />
+			</when>
+			<when expression='#["error" == attributes.queryParams.action]'>
+				<logger level="INFO" doc:name="Logger - Error" doc:id="fbc3bdf9-035e-42bf-a1e3-747f02076aab" message="Error Branch" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-error-types" doc:id="66eafe9b-bb14-455d-8cd2-df8215c5dd4a" name="anypoint-platform-demo-premade-error-types" />
+			</when>
+			<when expression='#["for_each" == attributes.queryParams.action]'>
+				<logger level="INFO" doc:name="Logger - For Each" doc:id="67f349f8-b6b3-4fb9-ace0-c763a1202921" message="For Each Branch" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-for-each-types" doc:id="1d88e449-b40c-4b2b-947f-9fdd75b77bda" name="anypoint-platform-demo-premade-for-each-types" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger - Default" doc:id="218de486-07ae-4af7-9368-2f332a682025" message="Default Branch" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="anypoint-platform-demo-premade-scatter-gather" doc:id="00e7e177-bc0e-48ea-8d86-af259a1b1064" >
+		<scatter-gather doc:name="Scatter-Gather" doc:id="a0f655f3-ff4f-4c7d-a88f-bdd1989952b3" >
+			<route >
+				<set-payload value='"Hi!"' doc:name="Set Payload" doc:id="75a84666-f4e5-4fb2-89e1-a9311b7dedfa" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-set-payload" doc:id="125efd25-5e7b-4eb6-842b-7611136fbfe8" name="anypoint-platform-demo-premade-log-payload" />
+			</route>
+			<route >
+				<set-payload value='"Hola!"' doc:name="Set Payload" doc:id="500a9d41-797b-4938-921e-aa068ea04840" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-set-payload" doc:id="d8479d6e-2fa7-4718-a39f-ea4427e47483" name="anypoint-platform-demo-premade-log-payload" />
+			</route>
+			<route >
+				<set-payload value='"Ciao!"' doc:name="Set Payload" doc:id="436ebe02-29a9-4c1c-9fe4-1c467080b350" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-set-payload" doc:id="9619a426-f706-460e-bcd0-d219091f6741" name="anypoint-platform-demo-premade-log-payload" />
+			</route>
+		</scatter-gather>
+	</sub-flow>
+	<sub-flow name="anypoint-platform-demo-premade-error-types" doc:id="19495ba5-cba8-4661-aa4b-f61fcd5b22a9" >
+		<choice doc:name="Error Router" doc:id="bd45b3de-43c2-4d0d-bb00-d20141c14701" >
+			<when expression='#["on_error_continue" == attributes.queryParams.errortype]'>
+				<logger level="INFO" doc:name="Logger - On Error Continue" doc:id="526f4c6e-a48a-42a1-bc92-cbdcc302a1e5" message="On Error Continue Branch" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-on-error-continue" doc:id="02c00ea4-084d-448d-bae5-111a152d5871" name="anypoint-platform-demo-premade-on-error-continue"/>
+			</when>
+			<when expression='#["on_error_propagate" == attributes.queryParams.errortype]'>
+				<logger level="INFO" doc:name="Logger - On Error Propagate" doc:id="56d19c11-6634-4464-9697-b06ca653f97d" message="On Error Propagate Branch" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-on-error-propagate" doc:id="2ca41f0b-1875-4c89-9f37-23031b176b8c" name="anypoint-platform-demo-premade-on-error-propagate"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger - Default" doc:id="321b6c8b-d37f-42d6-acd8-3af0cea5cd46" message="Default Branch" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="anypoint-platform-demo-premade-for-each-types" doc:id="d45bf973-d5a6-4a18-b842-4127b2ef5d4c" >
+		<choice doc:name="For Each Router" doc:id="53a12a3e-bd30-422a-9e32-befc76d0d56e">
+			<when expression='#["sequential" == attributes.queryParams.foreachtype]'>
+				<logger level="INFO" doc:name="Logger - For Each" doc:id="0721b57d-113e-4feb-a7f5-6d84c245c1b4" message="For Each Branch" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-for-each" doc:id="114c554c-c0ab-46fa-bb23-c786dd32c349" name="anypoint-platform-demo-premade-for-each" />
+			</when>
+			<when expression='#["parallel" == attributes.queryParams.foreachtype]'>
+				<logger level="INFO" doc:name="Logger - Parallel For Each" doc:id="364448be-06a3-4b27-8835-135101dcf4ab" message="Parallel For Each Branch" />
+				<flow-ref doc:name="anypoint-platform-demo-premade-parallel-for-each" doc:id="07bfc708-f40f-41f2-b1c5-5632972936ab" name="anypoint-platform-demo-premade-parallel-for-each" />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger - Default" doc:id="58da101f-3511-4db7-9fd2-373fad50eca9" message="Default Branch" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="anypoint-platform-demo-premade-on-error-continue" doc:id="d7f9a529-815b-499b-aed9-668ba4a76a65" >
+		<try doc:name="Try" doc:id="e879a30b-19c6-4123-adee-3575ae04654b" >
+			<raise-error doc:name="Raise error" doc:id="eb86f0b8-14cd-465d-a658-edb45b37868e" type="ANY" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="729aef02-6065-4470-bfa1-75e60745a0c6" >
+					<set-variable value="On Error Continue!" doc:name="Set Variable" doc:id="e34fb7c8-6a9c-4748-9075-a22704ed22fb" variableName="foo" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<flow-ref doc:name="anypoint-platform-demo-premade-log-variable" doc:id="326c1cbf-9534-40bb-a4bc-fbaa3cb68de8" name="anypoint-platform-demo-premade-log-variable" />
+	</sub-flow>
+	<sub-flow name="anypoint-platform-demo-premade-on-error-propagate" doc:id="c9e374bb-771a-48f6-b153-f3d1f4367e56" >
+		<try doc:name="Try" doc:id="79eea0ea-be38-4c58-98df-beb60802fd99" >
+			<raise-error doc:name="Raise error" doc:id="ee02e5e0-8760-4533-9d12-3caa0815fac4" type="ANY" />
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5e88ca49-5f13-4e25-b42a-fbf39b684ab4" >
+					<set-variable value="On Error Propagate!" doc:name="Set Variable" doc:id="3b3677ed-9e19-4d07-bed7-a154b107019d" variableName="foo" />
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<flow-ref doc:name="anypoint-platform-demo-premade-log-variable" doc:id="87653d1d-cc19-46b7-bac6-2ccf56f0ba40" name="anypoint-platform-demo-premade-log-variable" />
+	</sub-flow>
+	<sub-flow name="anypoint-platform-demo-premade-for-each" doc:id="fe3a45c7-4d5e-4de3-9c73-09e959c1f89b" >
+		<set-payload value='#[[&#10;	"Bye!",&#10;	"Sayonara!"&#10;]]' doc:name="Set Payload" doc:id="af75aa30-9287-46b2-9a26-47cebbbf4e77" />
+		<foreach doc:name="For Each" doc:id="9f2f241d-d566-4aee-8d15-b0088a3db471" collection="#[payload]">
+			<ee:transform doc:name="Transform Message" doc:id="fdd06309-38b2-46a1-94d9-2dac29876d28" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload ++ " , world!"]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="anypoint-platform-demo-premade-set-payload" doc:id="3e52c4f1-05cb-4e68-a7b1-bcbfed9c2fbb" name="anypoint-platform-demo-premade-log-payload" />
+		</foreach>
+	</sub-flow>
+	<sub-flow name="anypoint-platform-demo-premade-parallel-for-each" doc:id="10523dec-e8c7-49d8-9f7a-6c2f07650347" >
+		<set-payload value='#[[&#10;	"Bye!",&#10;	"Sayonara!"&#10;]]' doc:name="Set Payload" doc:id="a9552395-6eab-48e5-b85d-a81a87630a18" />
+		<parallel-foreach doc:name="Parallel For Each" doc:id="416cfef6-91ec-4450-b004-7820c6737788" collection="#[payload]">
+			<ee:transform doc:name="Transform Message" doc:id="4930669b-5594-4749-bb56-244e9d61094a" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload ++ " , world!"]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="anypoint-platform-demo-premade-set-payload" doc:id="151d5f39-964b-4b8c-ba4d-ce67d55533e1" name="anypoint-platform-demo-premade-log-payload" />
+		</parallel-foreach>
+	</sub-flow>
+	<sub-flow name="anypoint-platform-demo-premade-log-payload" doc:id="63bd14df-c469-47e6-949b-9e7b16c52fe8" >
+		<logger level="INFO" doc:name="Logger - payload" doc:id="06b7f3df-c9b2-47cd-9c65-573f6cba8943" message="#[payload]" />
+	</sub-flow>
+	<sub-flow name="anypoint-platform-demo-premade-log-variable" doc:id="964f2a13-00fb-41d1-967f-3bbc62e20dca" >
+		<logger level="INFO" doc:name="Logger - variable" doc:id="26399dce-cde2-4eef-9a94-17d5d65ca068" message="#[vars.foo]" />
+	</sub-flow>
+</mule>
